@@ -1,0 +1,11 @@
+#download hammerdb
+wget https://sourceforge.net/projects/hammerdb/files/HammerDB/HammerDB-3.1/HammerDB-3.1-Linux.tar.gz/download
+#extract
+tar -zxvf download
+
+#commands for setup
+dbset db mssqls
+diset connection mssqls_linux_server localhost
+diset tpcc mssqls_count_ware 800
+diset tpcc mssqls_num_vu 64
+diset connection mssqls_pass SqlExample!3

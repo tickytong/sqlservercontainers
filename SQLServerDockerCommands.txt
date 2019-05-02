@@ -1,0 +1,29 @@
+#Download Linux version of SQL Server 2019
+docker pull mcr.microsoft.com/mssql/server:2019-CTP2.4-ubuntu
+#Shows the images that are downloaded
+docker image ls
+
+#Installs the image to the container
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=SqlExample!2" -p 1433:1433 --name sql1 -d mcr.microsoft.com/mssql/server:2019-CTP2.4-ubuntu
+#Shows the containers that are currently running, both commands do the same thing
+docker container ls
+docker ps
+
+#Changes the SA password
+docker exec -it sql1 /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "SqlExample!2" -Q "ALTER LOGIN SA WITH PASSWORD='SqlExample!3'"
+
+#Connect to the instance using exec via bash
+docker exec -it sql1 "bash"
+#Use sqlcmd to connect to SQL instance
+/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'SqlExample!3'
+
+#Example SQL
+#Create TestDB and verify that it exists using sys.databases
+CREATE DATABASE TestDB
+SELECT Name from sys.Databases
+GO
+#Change focus to TestDB, create an Inventory table, and insert data
+USE TestDB
+CREATE TABLE Inventory (id INT, name NVARCHAR(50), quantity INT)
+INSERT INTO Inventory VALUES (1, 'banana', 150); INSERT INTO Inventory VALUES (2, 'orange', 154);
+GO
