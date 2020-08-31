@@ -4,7 +4,7 @@ docker pull mcr.microsoft.com/mssql/server
 docker image ls
 
 #Installs the image to the container
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=SqlExample!2" -p 1433:1433 --name sql1 -d mcr.microsoft.com/mssql/server:2019-CTP2.4-ubuntu
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=SqlExample!2" -p 1433:1433 --name sql1 -d mcr.microsoft.com/mssql/server
 #Shows the containers that are currently running, both commands do the same thing
 docker container ls
 docker ps
