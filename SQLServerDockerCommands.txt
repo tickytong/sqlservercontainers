@@ -1,5 +1,5 @@
 #Download Linux version of SQL Server 2019
-docker pull mcr.microsoft.com/mssql/server:2019-CTP2.4-ubuntu
+docker pull mcr.microsoft.com/mssql/server
 #Shows the images that are downloaded
 docker image ls
 
