@@ -1,0 +1,34 @@
+----Create key pair
+aws ec2 create-key-pair --key-name eks-sql-keypair --query 'KeyMaterial' --output text | out-file -encoding ascii -filepath eks-sql-keypair.pem
+
+----Create eks cluster
+eksctl create cluster --name eks-sql --version 1.17 --region us-west-2 --nodegroup-name linux-nodes --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 4 --ssh-access --ssh-public-key eks-sql-keypair --managed
+
+----Make IAM Policy for EBS volumes
+--Download
+curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-ebs-csi-driver/v0.5.0/docs/example-iam-policy.json
+--Create Policy in IAM
+aws iam create-policy --policy-name Amazon_EBS_CSI_Driver --policy-document file://example-iam-policy.json
+
+----Add Policy to Role name
+--Get IAM role name
+kubectl -n kube-system describe configmap aws-auth
+--Using role name (not the whole arn, just the name) from above command attach drive policy to said role
+aws iam attach-role-policy --policy-arn arn:aws:iam::097307621619:policy/Amazon_EBS_CSI_Driver --role-name eksctl-eks-sql-nodegroup-linux-no-NodeInstanceRole-RXEFYMWJ3S8R
+
+----Deploy driver
+--Clone git aws-ebs-csi-driver
+git clone https://github.com/kubernetes-sigs/aws-ebs-csi-driver.git
+--Apply driver with kubectl
+kubectl apply -k homedir\aws-ebs-csi-driver\deploy\kubernetes\overlays\stable\
+
+----Setup SA SA_PASSWORD
+kubectl create secret generic mssql --from-literal=SA_PASSWORD="SooperSecr3tPassword!"
+
+----Apply yaml files for EBS and SQL Server
+kubectl apply -k homedir\specs\
+--Check services exist
+kubectl get services
+
+----Connect to Server
+sqlcmd -S a9f8e9e72ea4d4f5991d36189b08b056-1182324820.us-west-2.elb.amazonaws.com -U sa -P "SooperSecr3tPassword!"
